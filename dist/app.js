@@ -1,19 +1,24 @@
 "use strict";
-function add(n1, n2, showResult, phrase) {
-    // if(typeof n1 !== 'number' || typeof n2 !== 'number'){
-    //     throw new Error("入力値が正しくありません。");
-    // }
-    const result = n1 + n2;
-    if (showResult) {
-        console.log(phrase + result);
+class Department {
+    constructor(id, name) {
+        this.id = id;
+        this.name = name;
+        this.employees = [];
     }
-    else {
-        return result;
+    describe() {
+        console.log(`Department (${this.id}): ${this.name}`);
+    }
+    addEmployee(employee) {
+        this.employees.push(employee);
+    }
+    printEmployeeInformation() {
+        console.log(this.employees.length);
+        console.log(this.employees);
     }
 }
-let number1 = 5;
-const number2 = 2.8;
-const prinResult = true;
-const resultPhrase = 'Reslt: ';
-add(number1, number2, prinResult, resultPhrase);
+const accounting = new Department('d1', 'Accounting');
+accounting.addEmployee('Max');
+accounting.addEmployee('Manu');
+accounting.describe();
+accounting.printEmployeeInformation();
 //# sourceMappingURL=app.js.map

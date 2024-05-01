@@ -1,18 +1,34 @@
-function add(n1: number, n2: number, showResult: boolean, phrase: string) {
-    // if(typeof n1 !== 'number' || typeof n2 !== 'number'){
-    //     throw new Error("入力値が正しくありません。");
-    // }
-    const result = n1 + n2;
-    if(showResult){
-        console.log(phrase + result);
-    } else {
-        return result;
+class Department {
+    // private id: string;
+    // name: string;
+    private employees: string[] = [];
+
+    constructor(private readonly id: string, public name: string) {
+        // this.id = id;
+        // this.name = n;
+    }
+
+    describe(this: Department) {
+        console.log(`Department (${this.id}): ${this.name}`);
+    }
+
+    addEmployee(employee: string) {
+        this.employees.push(employee);
+    }
+
+    printEmployeeInformation() {
+        console.log(this.employees.length);
+        console.log(this.employees);
     }
 }
 
-let number1 = 5;
-const number2 = 2.8;
-const prinResult = true;
-const resultPhrase = 'Reslt: ';
+const accounting = new Department('d1', 'Accounting');
 
-add(number1, number2, prinResult, resultPhrase);
+accounting.addEmployee('Max');
+accounting.addEmployee('Manu');
+
+
+// console.log(accouting);
+
+accounting.describe();
+accounting.printEmployeeInformation();
