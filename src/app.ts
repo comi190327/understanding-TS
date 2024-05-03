@@ -1,16 +1,19 @@
-class Department {
+abstract class Department {
+  static fiscalYear = 2024;
   // private id: string;
   // name: string;
   protected employees: string[] = [];
 
-  constructor(private readonly id: string, public name: string) {
+  static createEmployee(name: string) {
+    return { name: name };
+  }
+
+  constructor(protected readonly id: string, public name: string) {
     // this.id = id;
     // this.name = n;
   }
 
-  describe(this: Department) {
-    console.log(`Department (${this.id}): ${this.name}`);
-  }
+  abstract describe(this: Department): void;
 
   addEmployee(employee: string) {
     this.employees.push(employee);
@@ -28,10 +31,15 @@ class ITDepartment extends Department {
     super(id, "IT");
     this.admins = admins;
   }
+
+  describe() {
+    console.log("IT部門 - ID: " + this.id);
+  }
 }
 
 class AccountingDepartment extends Department {
   private lastReport: string;
+  private static instance: AccountingDepartment;
 
   get mostRecentReport() {
     if (this.lastReport) {
@@ -47,9 +55,21 @@ class AccountingDepartment extends Department {
     this.addReport(value);
   }
 
-  constructor(id: string, private reports: string[]) {
+  private constructor(id: string, private reports: string[]) {
     super(id, "Accounting");
     this.lastReport = reports[0];
+  }
+
+  static getInstance() {
+    if (this.instance) {
+      return this.instance;
+    }
+    this.instance = new AccountingDepartment("d2", []);
+    return this.instance;
+  }
+
+  describe() {
+    console.log("会計部門 - ID: " + this.id);
   }
 
   addReport(text: string) {
@@ -68,6 +88,9 @@ class AccountingDepartment extends Department {
   }
 }
 
+const employee1 = Department.createEmployee("Max");
+console.log(employee1, Department.fiscalYear);
+
 const it = new ITDepartment("d1", ["Max"]);
 
 it.addEmployee("Max");
@@ -79,15 +102,20 @@ it.describe();
 it.printEmployeeInformation();
 console.log(it);
 
-const accouting = new AccountingDepartment("d2", []);
+// const accouting = new AccountingDepartment("d2", []);
+const accouting = AccountingDepartment.getInstance();
+const accouting2 = AccountingDepartment.getInstance();
+
+console.log(accouting, accouting2);
 
 accouting.mostRecentReport = "通期会計レポート";
 
 accouting.addReport("Someting");
-accouting.printReports();
+// accouting.printReports();
 console.log(accouting.mostRecentReport);
 
 accouting.addEmployee("Max");
 accouting.addEmployee("Manu");
 
-accouting.printEmployeeInformation();
+// accouting.printEmployeeInformation();
+accouting.describe();
