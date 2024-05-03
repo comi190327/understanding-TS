@@ -41,5 +41,5 @@ let user1: Greetable;
 
 user1 = new Person();
 
-user1.greet("Hello, I am");
+user1.greet("Hello I am");
 console.log(user1);
