@@ -106,7 +106,7 @@ console.log(it);
 const accouting = AccountingDepartment.getInstance();
 const accouting2 = AccountingDepartment.getInstance();
 
-console.log(accouting, accouting2);
+// console.log(accouting, accouting2);
 
 accouting.mostRecentReport = "通期会計レポート";
 
