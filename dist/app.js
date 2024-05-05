@@ -1,26 +1,28 @@
 "use strict";
-let add;
-add = (n1, n2) => {
-    return n1 + n2;
+var _a;
+const e1 = {
+    name: "Max",
+    privilages: ["create - server"],
+    startDate: new Date(),
 };
-class Person {
-    constructor(n) {
-        this.age = 30;
-        if (n) {
-            this.name = n;
-        }
+function add2(a, b) {
+    if (typeof a === "string" || typeof b === "string") {
+        return a.toString() + b.toString();
     }
-    greet(phrase) {
-        if (this.name) {
-            console.log(phrase + " " + this.name);
-        }
-        else {
-            console.log("Hi!");
-        }
-    }
+    return a + b;
 }
-let user1;
-user1 = new Person();
-user1.greet("Hello I am");
-console.log(user1);
+const result = add2("Hello", " TypeScript");
+result.split(" ");
+const fetchedUserData = {
+    id: "u1",
+    name: "user1",
+    job: {
+        title: "Developer",
+        description: "TypeScript",
+    },
+};
+console.log((_a = fetchedUserData === null || fetchedUserData === void 0 ? void 0 : fetchedUserData.job) === null || _a === void 0 ? void 0 : _a.title);
+const userInput = undefined;
+const storeData = userInput !== null && userInput !== void 0 ? userInput : "DEFAULT";
+console.log(storeData);
 //# sourceMappingURL=app.js.map
