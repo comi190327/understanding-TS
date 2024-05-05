@@ -16,4 +16,27 @@ function extractAndConvert(obj, key) {
     return "Value: " + obj[key];
 }
 extractAndConvert({ name: "Max" }, "name");
+class DataStrorage {
+    constructor() {
+        this.data = [];
+    }
+    addItem(item) {
+        this.data.push(item);
+    }
+    removeItem(item) {
+        if (this.data.indexOf(item) === -1) {
+            return;
+        }
+        this.data.splice(this.data.indexOf(item), 1);
+    }
+    getItems() {
+        return [...this.data];
+    }
+}
+const textStorage = new DataStrorage();
+textStorage.addItem("Data1");
+textStorage.addItem("Data2");
+textStorage.removeItem("Data1");
+console.log(textStorage.getItems());
+const numberStorage = new DataStrorage();
 //# sourceMappingURL=app.js.map
