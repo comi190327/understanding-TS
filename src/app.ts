@@ -107,4 +107,10 @@ if (userInputElement) {
 
 interface ErrorCOntainer {
   // {email: '正しいメールアドレスではありません', username: 'ユーザ名に記号を含めることはできません'}
+  [prop: string]: string;
 }
+
+const errorBag: ErrorCOntainer = {
+  email: "正しいメールアドレスではありません",
+  username: "ユーザ名に記号を含めることはできません",
+};
