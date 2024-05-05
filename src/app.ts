@@ -92,11 +92,6 @@ function createCourseGoal(
   courseGoal.description = description;
   courseGoal.completeUntil = date;
   return courseGoal as CourseGoal;
-  //   return {
-  //     title: title,
-  //     description: description,
-  //     completeUntil: date,
-  //   };
 }
 
 const names2: Readonly<string[]> = ["Max", "Anna"];
