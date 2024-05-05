@@ -1,28 +1,50 @@
 "use strict";
-var _a;
-const e1 = {
-    name: "Max",
-    privilages: ["create - server"],
-    startDate: new Date(),
-};
-function add2(a, b) {
-    if (typeof a === "string" || typeof b === "string") {
-        return a.toString() + b.toString();
-    }
-    return a + b;
+function merge(objA, objB) {
+    return Object.assign(objA, objB);
 }
-const result = add2("Hello", " TypeScript");
-result.split(" ");
-const fetchedUserData = {
-    id: "u1",
-    name: "user1",
-    job: {
-        title: "Developer",
-        description: "TypeScript",
-    },
-};
-console.log((_a = fetchedUserData === null || fetchedUserData === void 0 ? void 0 : fetchedUserData.job) === null || _a === void 0 ? void 0 : _a.title);
-const userInput = undefined;
-const storeData = userInput !== null && userInput !== void 0 ? userInput : "DEFAULT";
-console.log(storeData);
+const mergedObj = merge({ name: "Max", hobbies: ["Sports"] }, { age: 30 });
+console.log(mergedObj);
+function countAndDescribe(element) {
+    let desctriptionText = "値がありません。";
+    if (element.length > 0) {
+        desctriptionText = "値は" + element.length + "個です。";
+    }
+    return [element, desctriptionText];
+}
+console.log(countAndDescribe(["Sports", "Cooking"]));
+function extractAndConvert(obj, key) {
+    return "Value: " + obj[key];
+}
+extractAndConvert({ name: "Max" }, "name");
+class DataStrorage {
+    constructor() {
+        this.data = [];
+    }
+    addItem(item) {
+        this.data.push(item);
+    }
+    removeItem(item) {
+        if (this.data.indexOf(item) === -1) {
+            return;
+        }
+        this.data.splice(this.data.indexOf(item), 1);
+    }
+    getItems() {
+        return [...this.data];
+    }
+}
+const textStorage = new DataStrorage();
+textStorage.addItem("Data1");
+textStorage.addItem("Data2");
+textStorage.removeItem("Data1");
+console.log(textStorage.getItems());
+const numberStorage = new DataStrorage();
+function createCourseGoal(title, description, date) {
+    let courseGoal = {};
+    courseGoal.title = title;
+    courseGoal.description = description;
+    courseGoal.completeUntil = date;
+    return courseGoal;
+}
+const names2 = ["Max", "Anna"];
 //# sourceMappingURL=app.js.map

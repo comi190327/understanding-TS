@@ -1,140 +1,99 @@
-type Admin = {
-  name: string;
-  privilages: string[];
-};
+// const names: Array<string> = []; // string[]
 
-type Employee = {
-  name: string;
-  startDate: Date;
-};
+// const promise: Promise<number> = new Promise((resolve, reject) => {
+//   setTimeout(() => {
+//     // resolve("終わりました！");
+//     resolve(10);
+//   }, 2000);
+// });
 
-type ElevateEmployee = Admin & Employee;
+// promise.then((data) => {
+//   // data.split(' ');
+// });
 
-const e1: ElevateEmployee = {
-  name: "Max",
-  privilages: ["create - server"],
-  startDate: new Date(),
-};
-
-type Combinable = string | number;
-type Numeric = number | boolean;
-
-type Universal = Combinable & Numeric;
-
-function add2(a: number, b: number): number;
-function add2(a: string, b: string): string;
-function add2(a: string, b: number): string;
-function add2(a: number, b: string): string;
-function add2(a: Combinable, b: Combinable) {
-  if (typeof a === "string" || typeof b === "string") {
-    return a.toString() + b.toString();
-  }
-  return a + b;
+function merge<T extends object, U extends object>(objA: T, objB: U) {
+  return Object.assign(objA, objB);
 }
 
-const result = add2("Hello", " TypeScript");
-result.split(" ");
+const mergedObj = merge({ name: "Max", hobbies: ["Sports"] }, { age: 30 });
+console.log(mergedObj);
 
-const fetchedUserData = {
-  id: "u1",
-  name: "user1",
-  job: {
-    title: "Developer",
-    description: "TypeScript",
-  },
-};
+interface Lengthy {
+  length: number;
+}
 
-console.log(fetchedUserData?.job?.title);
+function countAndDescribe<T extends Lengthy>(element: T): [T, string] {
+  let desctriptionText = "値がありません。";
+  if (element.length > 0) {
+    desctriptionText = "値は" + element.length + "個です。";
+  }
+  return [element, desctriptionText];
+}
 
-const userInput = undefined;
+console.log(countAndDescribe(["Sports", "Cooking"]));
 
-const storeData = userInput ?? "DEFAULT";
+function extractAndConvert<T extends object, U extends keyof T>(
+  obj: T,
+  key: U
+) {
+  return "Value: " + obj[key];
+}
 
-console.log(storeData);
+extractAndConvert({ name: "Max" }, "name");
 
-// type UnknownEmployee = Employee | Admin;
+class DataStrorage<T extends string | number | boolean> {
+  private data: T[] = [];
 
-// function printEmployeeInformation2(emp: UnknownEmployee) {
-//   console.log(emp.name);
-//   if ("privilages" in emp) {
-//     console.log("privilages: " + emp.privilages);
-//   }
-//   if ("startDate" in emp) {
-//     console.log("privilages: " + emp.startDate);
-//   }
-// }
+  addItem(item: T) {
+    this.data.push(item);
+  }
 
-// printEmployeeInformation2({ name: "Manu", startDate: new Date() });
+  removeItem(item: T) {
+    if (this.data.indexOf(item) === -1) {
+      return;
+    }
+    this.data.splice(this.data.indexOf(item), 1);
+  }
 
-// class Car {
-//   drive() {
-//     console.log("運転中…");
-//   }
-// }
+  getItems() {
+    return [...this.data];
+  }
+}
 
-// class Truck {
-//   drive() {
-//     console.log("トラックを運転中…");
-//   }
+const textStorage = new DataStrorage<string>();
+textStorage.addItem("Data1");
+textStorage.addItem("Data2");
+textStorage.removeItem("Data1");
+console.log(textStorage.getItems());
 
-//   loadCargo(amount: number) {
-//     console.log("荷物を載せています…" + amount);
-//   }
-// }
+const numberStorage = new DataStrorage<number>();
 
-// type Vehicle = Car | Truck;
+// const objStorage = new DataStrorage<object>();
+// const obj = { name: "Max" };
+// objStorage.addItem(obj);
+// objStorage.addItem({ name: "Manu" });
+// // ...
+// objStorage.removeItem(obj);
+// console.log(objStorage.getItems());
 
-// const v1 = new Car();
-// const v2 = new Truck();
+interface CourseGoal {
+  title: string;
+  description: string;
+  completeUntil: Date;
+}
 
-// function useVeicle(vehicle: Vehicle) {
-//   vehicle.drive();
-//   if (vehicle instanceof Truck) {
-//     vehicle.loadCargo(1000);
-//   }
-// }
+function createCourseGoal(
+  title: string,
+  description: string,
+  date: Date
+): CourseGoal {
+  let courseGoal: Partial<CourseGoal> = {};
+  courseGoal.title = title;
+  courseGoal.description = description;
+  courseGoal.completeUntil = date;
+  return courseGoal as CourseGoal;
+}
 
-// useVeicle(v1);
-// useVeicle(v2);
-
-// interface Bird {
-//   type: "bird";
-//   flyingSpeed: number;
-// }
-
-// interface Horse {
-//   type: "horse";
-//   runningSpeed: number;
-// }
-
-// type Animal = Bird | Horse;
-
-// function moveAnimal(animal: Animal) {
-//   let speed;
-//   switch (animal.type) {
-//     case "bird":
-//       speed = animal.flyingSpeed;
-//       break;
-//     case "horse":
-//       speed = animal.runningSpeed;
-//   }
-//   console.log("移動速度: " + speed);
-// }
-
-// moveAnimal({ type: "bird", flyingSpeed: 10 });
-
-// // const userInputElement = <HTMLInputElement>document.getElementById("user-input")!;
-// const userInputElement = document.getElementById("user-input");
-// if (userInputElement) {
-//   (userInputElement as HTMLInputElement).value = "こんにちは";
-// }
-
-// interface ErrorCOntainer {
-//   // {email: '正しいメールアドレスではありません', username: 'ユーザ名に記号を含めることはできません'}
-//   [prop: string]: string;
-// }
-
-// const errorBag: ErrorCOntainer = {
-//   email: "正しいメールアドレスではありません",
-//   username: "ユーザ名に記号を含めることはできません",
-// };
+const names2: Readonly<string[]> = ["Max", "Anna"];
+// names2.push("Manu");
+// names2.pop();
