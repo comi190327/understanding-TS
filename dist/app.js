@@ -120,15 +120,23 @@ __decorate([
 const p = new Printer();
 const button = document.querySelector("button");
 button.addEventListener("click", p.showMessage);
-const registerdValidators = {};
+const registeredValidators = {};
 function Required(target, propName) {
-    registerdValidators[target.constructor.name] = Object.assign(Object.assign({}, registerdValidators[target.constructor.name]), { [propName]: ["required"] });
+    var _a, _b;
+    registeredValidators[target.constructor.name] = Object.assign(Object.assign({}, registeredValidators[target.constructor.name]), { [propName]: [
+            ...((_b = (_a = registeredValidators[target.constructor.name]) === null || _a === void 0 ? void 0 : _a[propName]) !== null && _b !== void 0 ? _b : []),
+            "required",
+        ] });
 }
 function PositiveNumber(target, propName) {
-    registerdValidators[target.constructor.name] = Object.assign(Object.assign({}, registerdValidators[target.constructor.name]), { [propName]: ["positive"] });
+    var _a, _b;
+    registeredValidators[target.constructor.name] = Object.assign(Object.assign({}, registeredValidators[target.constructor.name]), { [propName]: [
+            ...((_b = (_a = registeredValidators[target.constructor.name]) === null || _a === void 0 ? void 0 : _a[propName]) !== null && _b !== void 0 ? _b : []),
+            "positive",
+        ] });
 }
 function validate(obj) {
-    const objValidatorConfig = registerdValidators[obj.constructor.name];
+    const objValidatorConfig = registeredValidators[obj.constructor.name];
     if (!objValidatorConfig) {
         return true;
     }
