@@ -1,3 +1,17 @@
+// autobind decorator
+function autobind(_: any, _2: string, descriptor: PropertyDescriptor) {
+  const originalMethod = descriptor.value;
+  const adjDescriptor: PropertyDescriptor = {
+    configurable: true,
+    get() {
+      const boundFn = originalMethod.bind(this);
+      return boundFn;
+    },
+  };
+  return adjDescriptor;
+}
+
+// ProjectInput Class
 class ProjectInput {
   templateElement: HTMLTemplateElement; // template要素取得用
   hostElement: HTMLDivElement; // template要素出力用
@@ -37,6 +51,7 @@ class ProjectInput {
   }
 
   // 指定されたタグ内の値を出力する
+  @autobind
   private submitHandler(event: Event) {
     event.preventDefault();
     console.log(this.titleInputElement.value);
@@ -44,7 +59,7 @@ class ProjectInput {
 
   // submitが押されたことを受信する
   private configure() {
-    this.element.addEventListener("submit", this.submitHandler.bind(this));
+    this.element.addEventListener("submit", this.submitHandler);
   }
 
   // 取得した要素を追加し表示する
