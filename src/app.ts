@@ -1,3 +1,39 @@
+// Project State Management
+class ProjectState {
+  private listeners: any[] = [];
+  private projects: any[] = [];
+  private static instance: ProjectState;
+
+  private constructor() {}
+
+  static getInstance() {
+    if (this.instance) {
+      return this.instance;
+    }
+    this.instance = new ProjectState();
+    return this.instance;
+  }
+
+  addListener(linstenerFn: Function) {
+    this.listeners.push(linstenerFn);
+  }
+
+  addProject(title: string, description: string, manday: number) {
+    const newProject = {
+      id: Math.random().toString(),
+      title: title,
+      description: description,
+      manday: manday,
+    };
+    this.projects.push(newProject);
+    for (const linstenerFn of this.listeners) {
+      linstenerFn(this.projects.slice());
+    }
+  }
+}
+
+const projectState = ProjectState.getInstance();
+
 // validation
 interface Validatable {
   value?: string | number;
@@ -60,6 +96,7 @@ class ProjectList {
   templateElement: HTMLTemplateElement; // template要素取得用
   hostElement: HTMLDivElement; // template要素出力用
   element: HTMLElement; // template内要素取得用
+  assigneProjects: any[];
 
   constructor(private type: "active" | "finished") {
     // tamplateタグの内容を取得
@@ -67,6 +104,7 @@ class ProjectList {
       "project-list"
     )! as HTMLTemplateElement;
     this.hostElement = document.getElementById("app")! as HTMLDivElement;
+    this.assigneProjects = [];
 
     // template内のタグの中身を再帰的に取得
     const importedNode = document.importNode(
@@ -75,8 +113,25 @@ class ProjectList {
     );
     this.element = importedNode.firstElementChild as HTMLElement;
     this.element.id = `${this.type}-projects`;
+
+    projectState.addListener((projects: any[]) => {
+      this.assigneProjects = projects;
+      this.renderProjects();
+    });
+
     this.attach();
     this.renderContent();
+  }
+
+  private renderProjects() {
+    const listEl = document.getElementById(
+      `${this.type}-projects-list`
+    )! as HTMLUListElement;
+    for (const prjItem of this.assigneProjects) {
+      const listItem = document.createElement("li");
+      listItem.textContent = prjItem.title;
+      listEl.appendChild(listItem);
+    }
   }
 
   private renderContent() {
@@ -90,8 +145,6 @@ class ProjectList {
     this.hostElement.insertAdjacentElement("beforeend", this.element);
   }
 }
-
-//
 
 // ProjectInput Class
 class ProjectInput {
@@ -178,7 +231,7 @@ class ProjectInput {
     const userInput = this.gatherUserInput();
     if (Array.isArray(userInput)) {
       const [title, desc, manday] = userInput;
-      console.log(title, desc, manday);
+      projectState.addProject(title, desc, manday);
       this.clearInputs();
     }
   }
