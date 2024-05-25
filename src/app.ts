@@ -1,7 +1,26 @@
+// Project Type
+enum ProjectStatus {
+  Active,
+  Finished,
+}
+
+// Project Class
+class Project {
+  constructor(
+    public id: string,
+    public title: string,
+    public description: string,
+    public manday: number,
+    public status: ProjectStatus
+  ) {}
+}
+
 // Project State Management
+type listener = (items: Project[]) => void;
+
 class ProjectState {
-  private listeners: any[] = [];
-  private projects: any[] = [];
+  private listeners: listener[] = [];
+  private projects: Project[] = [];
   private static instance: ProjectState;
 
   private constructor() {}
@@ -14,17 +33,18 @@ class ProjectState {
     return this.instance;
   }
 
-  addListener(linstenerFn: Function) {
+  addListener(linstenerFn: listener) {
     this.listeners.push(linstenerFn);
   }
 
   addProject(title: string, description: string, manday: number) {
-    const newProject = {
-      id: Math.random().toString(),
-      title: title,
-      description: description,
-      manday: manday,
-    };
+    const newProject = new Project(
+      Math.random().toString(),
+      title,
+      description,
+      manday,
+      ProjectStatus.Active
+    );
     this.projects.push(newProject);
     for (const linstenerFn of this.listeners) {
       linstenerFn(this.projects.slice());
@@ -96,7 +116,7 @@ class ProjectList {
   templateElement: HTMLTemplateElement; // template要素取得用
   hostElement: HTMLDivElement; // template要素出力用
   element: HTMLElement; // template内要素取得用
-  assigneProjects: any[];
+  assigneProjects: Project[];
 
   constructor(private type: "active" | "finished") {
     // tamplateタグの内容を取得
@@ -114,7 +134,7 @@ class ProjectList {
     this.element = importedNode.firstElementChild as HTMLElement;
     this.element.id = `${this.type}-projects`;
 
-    projectState.addListener((projects: any[]) => {
+    projectState.addListener((projects: Project[]) => {
       this.assigneProjects = projects;
       this.renderProjects();
     });
