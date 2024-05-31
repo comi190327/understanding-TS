@@ -224,6 +224,7 @@ class ProjectList
     this.configure();
     this.renderContent();
   }
+
   @autobind
   dragOverHandler(event: DragEvent): void {
     if (event.dataTransfer && event.dataTransfer.types[0] === "text/plain") {
