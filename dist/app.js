@@ -5,100 +5,89 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
-function Logger(logString) {
-    console.log("LOGGER ファクトリ");
-    return function (constructor) {
-        console.log(logString);
-        console.log(constructor);
-    };
+var ProjectStatus;
+(function (ProjectStatus) {
+    ProjectStatus[ProjectStatus["Active"] = 0] = "Active";
+    ProjectStatus[ProjectStatus["Finished"] = 1] = "Finished";
+})(ProjectStatus || (ProjectStatus = {}));
+class Project {
+    constructor(id, title, description, manday, status) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.manday = manday;
+        this.status = status;
+    }
 }
-function WithTemplate(template, hookId) {
-    console.log("TEMPLATE ファクトリ");
-    return function (originalConstructor) {
-        return class extends originalConstructor {
-            constructor(..._) {
-                super();
-                console.log("テンプレートを表示");
-                const hookEl = document.getElementById(hookId);
-                if (hookEl) {
-                    hookEl.innerHTML = template;
-                    hookEl.querySelector("h1").textContent = this.name;
-                }
-            }
-        };
-    };
-}
-let Person = class Person {
+class State {
     constructor() {
-        this.name = "Max";
-        console.log("Personオブジェクトを作成中…");
+        this.listeners = [];
     }
-};
-Person = __decorate([
-    Logger("ログ出力中"),
-    WithTemplate("<h1>Personオブジェクト</h1>", "app")
-], Person);
-const pers = new Person();
-console.log(pers);
-function Log(target, propertyName) {
-    console.log("Property デコレータ");
-    console.log(target, propertyName);
+    addListener(linstenerFn) {
+        this.listeners.push(linstenerFn);
+    }
 }
-function Log2(target, name, descriptor) {
-    console.log("Accessor デコレータ");
-    console.log(target);
-    console.log(name);
-    console.log(descriptor);
-}
-function Log3(target, name, descriptor) {
-    console.log("Method デコレータ");
-    console.log(target);
-    console.log(name);
-    console.log(descriptor);
-}
-function Log4(target, name, position) {
-    console.log("Parametor デコレータ");
-    console.log(target);
-    console.log(name);
-    console.log(position);
-}
-class Product {
-    set price(val) {
-        if (val > 0) {
-            this._price = val;
+class ProjectState extends State {
+    constructor() {
+        super();
+        this.projects = [];
+    }
+    static getInstance() {
+        if (this.instance) {
+            return this.instance;
         }
-        else {
-            throw new Error("不正な価格です - 0以下は設定できません。");
+        this.instance = new ProjectState();
+        return this.instance;
+    }
+    addProject(title, description, manday) {
+        const newProject = new Project(Math.random().toString(), title, description, manday, ProjectStatus.Active);
+        this.projects.push(newProject);
+        this.updateListeners();
+    }
+    moveProject(projectId, newStatus) {
+        const project = this.projects.find((prj) => prj.id === projectId);
+        if (project && project.status !== newStatus) {
+            project.status = newStatus;
+            this.updateListeners();
         }
     }
-    constructor(t, p) {
-        this.title = t;
-        this._price = p;
-    }
-    getPriceWithTax(tax) {
-        return this._price * (1 + tax);
+    updateListeners() {
+        for (const linstenerFn of this.listeners) {
+            linstenerFn(this.projects.slice());
+        }
     }
 }
-__decorate([
-    Log
-], Product.prototype, "title", void 0);
-__decorate([
-    Log2
-], Product.prototype, "price", null);
-__decorate([
-    Log3,
-    __param(0, Log4)
-], Product.prototype, "getPriceWithTax", null);
-const p1 = new Product("Book", 100);
-const p2 = new Product("Book2", 200);
-function Autobind(_, _2, descriptor) {
+const projectState = ProjectState.getInstance();
+function validate(validatableInput) {
+    var _a;
+    let isValid = true;
+    if (validatableInput.required) {
+        isValid = isValid && ((_a = validatableInput.value) === null || _a === void 0 ? void 0 : _a.toString().trim().length) !== 0;
+    }
+    if (validatableInput.minLength !== undefined &&
+        typeof validatableInput.value === "string") {
+        isValid =
+            isValid && validatableInput.value.length >= validatableInput.minLength;
+    }
+    if (validatableInput.maxLength !== undefined &&
+        typeof validatableInput.value === "string") {
+        isValid =
+            isValid && validatableInput.value.length <= validatableInput.maxLength;
+    }
+    if (validatableInput.min !== undefined &&
+        typeof validatableInput.value === "number") {
+        isValid = isValid && validatableInput.value >= validatableInput.min;
+    }
+    if (validatableInput.max !== undefined &&
+        typeof validatableInput.value === "number") {
+        isValid = isValid && validatableInput.value <= validatableInput.max;
+    }
+    return isValid;
+}
+function autobind(_, _2, descriptor) {
     const originalMethod = descriptor.value;
     const adjDescriptor = {
         configurable: true,
-        enumerable: false,
         get() {
             const boundFn = originalMethod.bind(this);
             return boundFn;
@@ -106,79 +95,179 @@ function Autobind(_, _2, descriptor) {
     };
     return adjDescriptor;
 }
-class Printer {
-    constructor() {
-        this.message = "クリックしました！";
+class Component {
+    constructor(templateId, hostElementId, insertAtStart, newElementId) {
+        this.templateElement = document.getElementById(templateId);
+        this.hostElement = document.getElementById(hostElementId);
+        const importedNode = document.importNode(this.templateElement.content, true);
+        this.element = importedNode.firstElementChild;
+        if (newElementId) {
+            this.element.id = newElementId;
+        }
+        this.attach(insertAtStart);
     }
-    showMessage() {
-        console.log(this.message);
+    attach(insertAtBeginning) {
+        this.hostElement.insertAdjacentElement(insertAtBeginning ? "afterbegin" : "beforeend", this.element);
     }
 }
-__decorate([
-    Autobind
-], Printer.prototype, "showMessage", null);
-const p = new Printer();
-const button = document.querySelector("button");
-button.addEventListener("click", p.showMessage);
-const registeredValidators = {};
-function Required(target, propName) {
-    var _a, _b;
-    registeredValidators[target.constructor.name] = Object.assign(Object.assign({}, registeredValidators[target.constructor.name]), { [propName]: [
-            ...((_b = (_a = registeredValidators[target.constructor.name]) === null || _a === void 0 ? void 0 : _a[propName]) !== null && _b !== void 0 ? _b : []),
-            "required",
-        ] });
-}
-function PositiveNumber(target, propName) {
-    var _a, _b;
-    registeredValidators[target.constructor.name] = Object.assign(Object.assign({}, registeredValidators[target.constructor.name]), { [propName]: [
-            ...((_b = (_a = registeredValidators[target.constructor.name]) === null || _a === void 0 ? void 0 : _a[propName]) !== null && _b !== void 0 ? _b : []),
-            "positive",
-        ] });
-}
-function validate(obj) {
-    const objValidatorConfig = registeredValidators[obj.constructor.name];
-    if (!objValidatorConfig) {
-        return true;
-    }
-    let isValid = true;
-    for (const prop in objValidatorConfig) {
-        for (const validator of objValidatorConfig[prop]) {
-            switch (validator) {
-                case "required":
-                    isValid = isValid && !!obj[prop];
-                    break;
-                case "positive":
-                    isValid = isValid && obj[prop] > 0;
-                    break;
-            }
+class ProjectItem extends Component {
+    get manday() {
+        if (this.project.manday < 20) {
+            return this.project.manday.toString() + "人日";
+        }
+        else {
+            return (this.project.manday / 20).toString() + "人月";
         }
     }
-    return isValid;
-}
-class Course {
-    constructor(t, p) {
-        this.title = t;
-        this.price = p;
+    constructor(hostId, project) {
+        super("single-project", hostId, false, project.id);
+        this.project = project;
+        this.configure();
+        this.renderContent();
+    }
+    dragStartHandler(event) {
+        event.dataTransfer.setData("text/plain", this.project.id);
+        event.dataTransfer.effectAllowed = "move";
+    }
+    dragEndHandler(_) {
+        console.log("Drag終了");
+    }
+    configure() {
+        this.element.addEventListener("dragstart", this.dragStartHandler);
+        this.element.addEventListener("dragend", this.dragEndHandler);
+    }
+    renderContent() {
+        this.element.querySelector("h2").textContent = this.project.title;
+        this.element.querySelector("h3").textContent = this.manday;
+        this.element.querySelector("p").textContent = this.project.description;
     }
 }
 __decorate([
-    Required
-], Course.prototype, "title", void 0);
-__decorate([
-    PositiveNumber
-], Course.prototype, "price", void 0);
-const courseForm = document.querySelector("form");
-courseForm === null || courseForm === void 0 ? void 0 : courseForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const titleEl = document.getElementById("title");
-    const priceEl = document.getElementById("price");
-    const title = titleEl.value;
-    const price = +priceEl.value;
-    const createdCourse = new Course(title, price);
-    if (!validate(createdCourse)) {
-        alert("正しく入力してください");
-        return;
+    autobind
+], ProjectItem.prototype, "dragStartHandler", null);
+class ProjectList extends Component {
+    constructor(type) {
+        super("project-list", "app", false, `${type}-projects`);
+        this.type = type;
+        this.assigneProjects = [];
+        this.configure();
+        this.renderContent();
     }
-    console.log(createdCourse);
-});
+    dragOverHandler(event) {
+        if (event.dataTransfer && event.dataTransfer.types[0] === "text/plain") {
+            event.preventDefault();
+            const listEl = this.element.querySelector("ul");
+            listEl.classList.add("droppable");
+        }
+    }
+    dropHandler(event) {
+        const prjId = event.dataTransfer.getData("text/plain");
+        projectState.moveProject(prjId, this.type === "active" ? ProjectStatus.Active : ProjectStatus.Finished);
+    }
+    dragLeaveHandler(_) {
+        const listEl = this.element.querySelector("ul");
+        listEl.classList.remove("droppable");
+    }
+    configure() {
+        this.element.addEventListener("dragover", this.dragOverHandler);
+        this.element.addEventListener("drop", this.dropHandler);
+        this.element.addEventListener("dragleave", this.dragLeaveHandler);
+        projectState.addListener((projects) => {
+            const relevantProjects = projects.filter((prj) => {
+                if (this.type === "active") {
+                    return prj.status === ProjectStatus.Active;
+                }
+                return prj.status === ProjectStatus.Finished;
+            });
+            this.assigneProjects = relevantProjects;
+            this.renderProjects();
+        });
+        this.renderContent();
+    }
+    renderContent() {
+        const listId = `${this.type}-projects-list`;
+        this.element.querySelector("ul").id = listId;
+        this.element.querySelector("h2").textContent =
+            this.type === "active" ? "実行中プロジェクト" : "完了プロジェクト";
+    }
+    renderProjects() {
+        const listEl = document.getElementById(`${this.type}-projects-list`);
+        listEl.innerHTML = "";
+        for (const prjItem of this.assigneProjects) {
+            new ProjectItem(listEl.id, prjItem);
+        }
+    }
+}
+__decorate([
+    autobind
+], ProjectList.prototype, "dragOverHandler", null);
+__decorate([
+    autobind
+], ProjectList.prototype, "dropHandler", null);
+__decorate([
+    autobind
+], ProjectList.prototype, "dragLeaveHandler", null);
+class ProjectInput extends Component {
+    constructor() {
+        super("project-input", "app", true, "user-input");
+        this.titleInputElement = this.element.querySelector("#title");
+        this.descriptionInputElement = this.element.querySelector("#description");
+        this.mandayInputElement = this.element.querySelector("#manday");
+        this.configure();
+    }
+    configure() {
+        this.element.addEventListener("submit", this.submitHandler);
+    }
+    renderContent() { }
+    gatherUserInput() {
+        const enteredTitle = this.titleInputElement.value;
+        const enteredDescription = this.descriptionInputElement.value;
+        const enteredManday = this.mandayInputElement.value;
+        const titleValidatable = {
+            value: enteredTitle,
+            required: true,
+        };
+        const descriptionValidatable = {
+            value: enteredDescription,
+            required: true,
+            minLength: 5,
+        };
+        const mandayValidatable = {
+            value: +enteredManday,
+            required: true,
+            min: 1,
+            max: 1000,
+        };
+        if (!validate(titleValidatable) ||
+            !validate(descriptionValidatable) ||
+            !validate(mandayValidatable)) {
+            alert("入力値が正しくありません。再度お試しください。");
+            return;
+        }
+        else {
+            return [enteredTitle, enteredDescription, +enteredManday];
+        }
+    }
+    clearInputs() {
+        this.titleInputElement.value = "";
+        this.descriptionInputElement.value = "";
+        this.mandayInputElement.value = "";
+    }
+    submitHandler(event) {
+        event.preventDefault();
+        console.log(this.titleInputElement.value);
+        const userInput = this.gatherUserInput();
+        if (Array.isArray(userInput)) {
+            const [title, desc, manday] = userInput;
+            projectState.addProject(title, desc, manday);
+            this.clearInputs();
+        }
+    }
+}
+__decorate([
+    autobind
+], ProjectInput.prototype, "submitHandler", null);
+const prjInput = new ProjectInput();
+const activePrjList = new ProjectList("active");
+const finishedPrjList = new ProjectList("finished");
 //# sourceMappingURL=app.js.map
