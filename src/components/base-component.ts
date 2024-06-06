@@ -1,5 +1,8 @@
 // Component Class
-export abstract class Component<T extends HTMLElement, U extends HTMLElement> {
+export default abstract class Component<
+  T extends HTMLElement,
+  U extends HTMLElement
+> {
   templateElement: HTMLTemplateElement; // template要素取得用
   hostElement: T; // template要素出力用
   element: U; // template内要素取得用
