@@ -37,6 +37,5 @@ export class ProjectState extends State {
         }
     }
 }
-console.log("実行中．．．");
 export const projectState = ProjectState.getInstance();
 //# sourceMappingURL=project-state.js.map
